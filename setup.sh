@@ -1,8 +1,8 @@
 #!/bin/bash
 kernel_name="myKernel"
+linux_version="5.3.5"
 
-function setup (){
-	local linux_version="5.3.5"
+function init (){
 	local url="https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-${linux_version}.tar.xz"
 	local syscall_num=436
 	local syscall_tbl="arch/x86/entry/syscalls/syscall_64.tbl"
@@ -28,7 +28,7 @@ function setup (){
 
 	sed -i -e "${incert_num}i ${incert_line}" ${syscall_tbl} 
 
-	sed -i -e "1i #include \"../${func_name}\"" kernel/sys.c
+	sed -i -e "1i #include \"../../${func_name}\"" kernel/sys.c
 
 	make oldconfig
 }
@@ -58,8 +58,8 @@ fi
 
 echo $1
 
-if [ $1 = "setup" ]; then
-	setup
+if [ $1 = "init" ]; then
+	init
 elif [ $1 = "deploy" ]; then
 	deploy
 fi
