@@ -1,5 +1,10 @@
 # syshello
 A script for development of Linux system call.
+This repo was developed  referencing this cite: https://postd.cc/kernel-dev-ep3/.
+
+# Enviroment
+This repo was developed on the Archlinux (Linux kernel 5.3.5) on VirtualBox.
+I download the OS from this cite: https://www.osboxes.org/arch-linux/.
 
 # Usage
 First, clone this repo, change the access permissions of setup.sh, and download Linux kernel source code.
