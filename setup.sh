@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/bash -x
 kernel_name="myKernel"
 linux_version="5.3.5"
+JOBS=$[$(grep cpu.cores /proc/cpuinfo | sort -u | sed 's/[^0-9]//g') + 1]
 
 function init (){
 	local url="https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-${linux_version}.tar.xz"
@@ -20,7 +21,7 @@ function init (){
 
 	zcat /proc/config.gz > .config 
 
-	sed -i -e 's/\".\+\"$/\"-'${kernel_name}'\"/g' .config
+sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
 
 	cat ${syscall_tbl} | grep -n `expr ${syscall_num} - 1` | sed -e 's/:.*//g' > tmp
 
@@ -28,7 +29,7 @@ function init (){
 
 	sed -i -e "${incert_num}i ${incert_line}" ${syscall_tbl} 
 
-	sed -i -e "1i #include \"../../${func_name}\"" kernel/sys.c
+	echo "#include \"../../${func_name}\""  >> kernel/sys.c
 
 	make oldconfig
 }
@@ -38,10 +39,10 @@ function deploy (){
 
 	set -e
 
-	make
-	make modules_install
+	make 
+	make modules_install 
 
-	cp arch/x86_64/boot/bzImage /boot/vmlinuz-linux${kernel_name}
+	cp arch/x86_64/boot/bzImage /boot/vmlinuz-linux-${kernel_name}
 
 	sed s/linux/linux-${kernel_name}/g \
 	    </etc/mkinitcpio.d/linux.preset \
@@ -49,6 +50,10 @@ function deploy (){
 	mkinitcpio -p linux-${kernel_name}
 
 	grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+function clearn (){
+	rm -rf linux-${linux_version}*
 }
 
 if [ $# -eq 0 ]; then
@@ -62,6 +67,11 @@ if [ $1 = "init" ]; then
 	init
 elif [ $1 = "deploy" ]; then
 	deploy
+elif [ $1 = "clearn" ]; then
+	clearn
+else
+	echo "error: invalid argument"
 fi
 
 exit 0
+
