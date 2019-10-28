@@ -20,8 +20,9 @@ Build kernel with your system call by executing ./setup.sh deploy
 ```
 If succesfully finished build, you can check the message from your system call. 
 ```
-$ cd ./syshello
-$ gcc mycallTest.c
-$ ./a.out
-$ dmesg | grep hello
+$ sudo su
+# cd ./syshello
+# gcc mycallTest.c
+# ./a.out
+# dmesg | grep hello
 ```
