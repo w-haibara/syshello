@@ -21,7 +21,7 @@ function init (){
 
 	zcat /proc/config.gz > .config 
 
-sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
+	sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
 
 	cat ${syscall_tbl} | grep -n `expr ${syscall_num} - 1` | sed -e 's/:.*//g' > tmp
 
