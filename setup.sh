@@ -1,4 +1,4 @@
-#!/bin/bash -x 
+#!/bin/bash
 kernel_name="myKernel"
 linux_version="5.3.5"
 JOBS=$[$(grep cpu.cores /proc/cpuinfo | sort -u | sed 's/[^0-9]//g') + 1]
@@ -25,7 +25,8 @@ function init (){
 
 	zcat /proc/config.gz > .config 
 
-	if [ 'grep ${incert_line} ${incert_tbl}' ]; then 
+
+	if grep "${incert_line}" ${syscall_tbl} > /dev/null; then
 		echo "note: syscall:${syscall_num} was allready incerted in syscall table"
 	else
 		sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
@@ -37,15 +38,10 @@ function init (){
 	fi
 
 	incert_line="#include \"../../${func_name}\""
-	
-	grep "${incert_line}" ${sys_c}
-	
-	exit 0
-
-	if [ 'grep "${incert_line}" ${sys_c}' ]; then 
-		echo "${incert_line}" >> ${sys_c}
-	else
+	if grep "${incert_line}" ${sys_c} > /dev/null; then
 		echo "note: ${func_name} was allready included in kernel/sys.c"
+	else
+		echo "${incert_line}" >> ${sys_c}
 	fi
 
 	make oldconfig
