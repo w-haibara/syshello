@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -x 
 kernel_name="myKernel"
 linux_version="5.3.5"
 JOBS=$[$(grep cpu.cores /proc/cpuinfo | sort -u | sed 's/[^0-9]//g') + 1]
@@ -10,10 +10,14 @@ function init (){
 	local syscall_name="hello"
 	local incert_line="${syscall_num}	common	${syscall_name}			__x64_sys_${syscall_name}"
 	local func_name="mycall.c"
+	local sys_c="kernel/sys.c"
 
-	curl -O -J ${url}
-
-	tar xvf linux-${linux_version}.tar.xz
+	if [ -e "linux-${linux_version}/" ]; then 
+		echo "note: linux sorce code was allready donwloaded"
+	else	
+		curl -O -J ${url}
+		tar xvf linux-${linux_version}.tar.xz
+	fi
 
 	zcat /proc/config.gz > ./linux-${linux_version}/.config
 
@@ -21,23 +25,34 @@ function init (){
 
 	zcat /proc/config.gz > .config 
 
-	sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
+	if [ 'grep ${incert_line} ${incert_tbl}' ]; then 
+		echo "note: syscall:${syscall_num} was allready incerted in syscall table"
+	else
+		sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
+		
+		local incert_num=`cat ${syscall_tbl} | grep -n \`expr ${syscall_num} - 1\` | sed -e 's/:.*//g'`
+		incert_num=`expr ${incert_num} + 1`
+		
+		sed -i -e "${incert_num}i ${incert_line}" ${syscall_tbl} 
+	fi
 
-	cat ${syscall_tbl} | grep -n `expr ${syscall_num} - 1` | sed -e 's/:.*//g' > tmp
+	incert_line="#include \"../../${func_name}\""
+	
+	grep "${incert_line}" ${sys_c}
+	
+	exit 0
 
-	local incert_num=`expr $(cat tmp) + 1`
-
-	sed -i -e "${incert_num}i ${incert_line}" ${syscall_tbl} 
-
-	echo "#include \"../../${func_name}\""  >> kernel/sys.c
+	if [ 'grep "${incert_line}" ${sys_c}' ]; then 
+		echo "${incert_line}" >> ${sys_c}
+	else
+		echo "note: ${func_name} was allready included in kernel/sys.c"
+	fi
 
 	make oldconfig
 }
 
 function deploy (){
 	cd ./linux-${linux_version}
-
-	set -e
 
 	make 
 	make modules_install 
@@ -55,6 +70,11 @@ function deploy (){
 function clearn (){
 	rm -rf linux-${linux_version}*
 }
+
+
+# --- main ---
+
+set -e
 
 if [ $# -eq 0 ]; then
 	echo "error: argument is required"
