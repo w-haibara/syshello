@@ -88,7 +88,7 @@ if [ $1 = "init" ]; then
 elif [ $1 = "deploy" ]; then
 	deploy
 elif [ $1 = "clean" ]; then
-	clearn
+	clean
 else
 	echo "error: invalid argument"
 fi
