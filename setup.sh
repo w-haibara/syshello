@@ -67,7 +67,7 @@ function deploy (){
 	grub-mkconfig -o /boot/grub/grub.cfg
 }
 
-function clearn (){
+function clean (){
 	rm -rf linux-${linux_version}*
 }
 
@@ -87,7 +87,7 @@ if [ $1 = "init" ]; then
 	init
 elif [ $1 = "deploy" ]; then
 	deploy
-elif [ $1 = "clearn" ]; then
+elif [ $1 = "clean" ]; then
 	clearn
 else
 	echo "error: invalid argument"
