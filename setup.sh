@@ -12,10 +12,15 @@ function init (){
 	local func_name="mycall.c"
 	local sys_c="kernel/sys.c"
 
-	if [ -e "linux-${linux_version}/" ]; then 
+	if [ -e "linux-${linux_version}.tar.xz" ]; then 
 		echo "note: linux sorce code was allready donwloaded"
 	else	
 		curl -O -J ${url}
+	fi
+
+	if [ -e "linux-${linux_version}/" ]; then 
+		echo "note: linux sorce code was allready expanded"
+	else	
 		tar xvf linux-${linux_version}.tar.xz
 	fi
 
