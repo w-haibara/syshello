@@ -13,13 +13,13 @@ function init (){
 	local sys_c="kernel/sys.c"
 
 	if [ -e "linux-${linux_version}.tar.xz" ]; then 
-		echo "note: linux sorce code was allready donwloaded"
+		echo "note: linux sorce code was already donwloaded"
 	else	
 		curl -O -J ${url}
 	fi
 
 	if [ -e "linux-${linux_version}/" ]; then 
-		echo "note: linux sorce code was allready expanded"
+		echo "note: linux sorce code was already expanded"
 	else	
 		tar xvf linux-${linux_version}.tar.xz
 	fi
@@ -32,7 +32,7 @@ function init (){
 
 
 	if grep "${incert_line}" ${syscall_tbl} > /dev/null; then
-		echo "note: syscall:${syscall_num} was allready incerted in syscall table"
+		echo "note: syscall:${syscall_num} was already incerted in syscall table"
 	else
 		sed -i -e '/^CONFIG_LOCALVERSION=/s/\".\+\"$/\"-'${kernel_name}'\"/gi' .config
 		
@@ -44,7 +44,7 @@ function init (){
 
 	incert_line="#include \"../../${func_name}\""
 	if grep "${incert_line}" ${sys_c} > /dev/null; then
-		echo "note: ${func_name} was allready included in kernel/sys.c"
+		echo "note: ${func_name} was already included in kernel/sys.c"
 	else
 		echo "${incert_line}" >> ${sys_c}
 	fi
